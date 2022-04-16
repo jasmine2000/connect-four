@@ -37,14 +37,14 @@ int main() {
 
                 int index = find_player(new_player, all_players);
                 strcpy(all_players[index], new_player);
-                
+
             }
                         
             // state = GAMEPLAY;
 
         } else if (state == GAMEPLAY) {
 
-            printboard(board);
+            // printboard(board);
 
         } else if (state == LEADERBOARD) {
 
