@@ -24,6 +24,7 @@ int main() {
     int current_player;     // index of current player (from player_arr)
 
     int winner;                 // index of winner (from player_arr)
+    int showboard;
 
     int selection;
     int current_column;
@@ -32,6 +33,7 @@ int main() {
     int board[6][7];
 
     for(;;) {
+
         if (state == SETUP) {
             clear_board(board);
 
@@ -66,7 +68,10 @@ int main() {
 
             else if (selection == 9) {
                 int confirmation = early_exit();
-                if (confirmation == 1) state = LEADERBOARD;
+                if (confirmation == 1) {
+                    state = LEADERBOARD;
+                    showboard = 1;
+                } else selection = current_column;
 
             } else {
                 current_column = selection;
@@ -87,6 +92,7 @@ int main() {
             if (row == 6) {
                 printf("Column is full.\n");
                 selection = 4;
+                state = CHOOSING;
             } else {
                 board[row][column_index] = current_player + 1;
                 printboard(board, 0, current_player + 1);
@@ -95,17 +101,40 @@ int main() {
                 winner = check_winner(board);
                 if (winner > 0) {
                     state = ENDGAME;
-                }
 
-                current_player = (current_player + 1) % 2;
-                selection = 4;
+                } else {
+                    current_player = (current_player + 1) % 2;
+                    selection = 4;
+                    
+                    state = CHOOSING;
+                }
             }
-            state = CHOOSING;
 
         } else if (state == ENDGAME) {
+            
+                all_scores[player_arr[winner - 1]]++;
+                printf("%s won!\n", all_players[player_arr[winner - 1]]);
+
+                state = LEADERBOARD;
+            
 
         } else if (state == LEADERBOARD) {
 
+            printf("\nLEADERBOARD\n");
+            for (int i = 0; i < 10; i=i+1) {
+                char player[11] = {0};
+                strcpy(player, all_players[i]); // get player at index
+
+                if (player[0] != '\0') {        // if empty
+                    printf("%s: %d\n", player, all_scores[i]);
+                }
+            }
+            
+            printf("Press enter to start a new game: ");
+            char buffer[3];
+            fgets(buffer, 3, stdin);
+
+            state = SETUP;
         }
     }
 }
