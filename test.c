@@ -8,10 +8,26 @@
 #include "output.h"
 #include "leaderboard.h"
 
+const int max_players = 9;
+
+void winner_tests();
+void sort_tests();
+void setup_tests();
 
 
 int main() {
+
+    winner_tests();
+
+    sort_tests();
+
+    setup_tests();
     
+    return 0;
+}
+
+
+void winner_tests() {
     // board
     int board[6][7];
     int winner;
@@ -76,14 +92,20 @@ int main() {
     assert(winner == 0);
 
     printf("Passed all winner tests.\n");
+}
 
+void sort_tests() {
     char all_players1[10][11] = {{"last"}, {"middle"}, {"first"}};
     int all_scores[10] = {1, 2, 3};
-    sort_names_scores(all_players1, all_scores);
+    int player_arr[2] = {0, 1};
+    sort_names_scores(all_players1, all_scores, player_arr);
     show_stats(all_players1, all_scores);
 
     printf("Leaderboard ^\n\n");
+}
 
+
+void setup_tests() {
     int action;
     int players_exist;
     int next;
@@ -95,26 +117,24 @@ int main() {
 
     for (;;) {
         int next = next_available(all_players);
-        if (next == 0) {
-            players_exist = 0;
-        } else {
-            players_exist = 1;
-        }
 
-        action = player_screen(all_players, player_arr, players_exist);
+        action = player_screen(all_players, player_arr, next);
 
-        if (action == 0 || action == 1) {
-            int player_num = select_player(all_players, action + 1, next);
-            if (player_num == 0) {
-                printf("Can't select that player. \n");
-            } else {
-                int player_index = player_num - 1;
-                // PLAYER_ARR GETS SET HERE
-                printf("player %d got set to %s", action + 1, all_players[player_index]);
+        if (action == ASSIGN_1 || action == ASSIGN_2) {
+            show_players(all_players, next);
+            if (next > 0) {
+                printf("Player %d choose from list: ", action + 1);
+                int player_num = select_player(all_players, next);
+                if (player_num == 0) {
+                    printf("Can't select that player. \n");
+                } else {
+                    int player_index = player_num - 1;
+                    player_arr[action] = player_index;
+                }
             }
 
-        } else if (action == 2) {
-            if (next == 10) {
+        } else if (action == ADD_PLAYER) {
+            if (next == max_players) {
                 printf("%s", "Can't add any more players. Delete one and try again. \n");
             } else {
                 char new_player[11];
@@ -122,23 +142,47 @@ int main() {
                 strcpy(all_players[next], new_player);
             }
 
-        } else if (action == 3) {
-            int delete_number = select_delete(all_players);
+        } else if (action == DELETE_PLAYER) {
+            show_players(all_players, next);
+            if (next > 0) {
+                printf("%s", "\nSelect player number to delete: ");
+                int delete_number = select_player(all_players, next);
 
-            if (delete_number == 0) {
-                printf("Can't delete that.\n");
-            } else {
-                int delete_index = delete_number - 1;
-                char delete_player[11];
-                strcpy(delete_player, all_players[delete_index]);
-                if (confirm_delete(delete_player) == 1) {
-                    do_delete(all_players, delete_index);
-                };
+                if (delete_number == 0) {
+                    printf("Can't delete that.\n");
+                } else {
+                    int delete_index = delete_number - 1;
+                    char delete_player[11];
+                    strcpy(delete_player, all_players[delete_index]);
+                    if (confirm_delete(delete_player) == 1) {
+                        do_delete(all_players, delete_index);
+                    };
+                }
             }
-        } else if (action == 4) {
-            printf("Confirming.\n");
+            
+        } else if (action == CONFIRM_PLAYERS) {
+            if (player_arr[0] == max_players || player_arr[1] == max_players) {
+                printf("Players are not both set.\n\n");
+            } else if (player_arr[0] == player_arr[1]) {
+                printf("Player 1 and 2 are the same. Reassign one of them.\n\n");
+            } else {
+                printf("Player 1 \t %s\n", all_players[player_arr[0]]);
+                printf("Player 2 \t %s\n", all_players[player_arr[1]]);
 
-        } else {
+                printf("Confirm selection? (y/n) ");
+                char buffer[5];
+                fgets(buffer, 5, stdin);
+                if (buffer[0] == 'y') {
+                    // CONFIRMED
+
+                    // current_player = 0;
+                    // selection = 4;
+
+                    // state = CHOOSING;
+                }
+            }
+
+        } else { // invalid
             printf("Unrecognized action.\n");
         }
     }
