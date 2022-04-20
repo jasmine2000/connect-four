@@ -99,7 +99,7 @@ int player_screen(char all_players[max_players][11], int player_arr[2], int next
     else return INVALID;
 }
 
-int select_player(char all_players[max_players][11], int next) {
+int select_player(int next) {
     // selects existing player
 
     char buffer[3];

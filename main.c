@@ -7,6 +7,8 @@
 #include "output.h"
 #include "leaderboard.h"
 
+// #include "integration.h"
+
 const int SETUP=0;
 const int CHOOSING=1;
 const int DROPPING=2;
@@ -48,7 +50,7 @@ int main() {
                 show_players(all_players, next);
                 if (next > 0) {
                     printf("Player %d choose from list: ", action + 1);
-                    int player_num = select_player(all_players, next);
+                    int player_num = select_player(next);
                     if (player_num == 0) {
                         printf("Can't select that player. \n");
                     } else {
@@ -70,7 +72,7 @@ int main() {
                 show_players(all_players, next);
                 if (next > 0) {
                     printf("%s", "\nSelect player number to delete: ");
-                    int delete_number = select_player(all_players, next);
+                    int delete_number = select_player(next);
 
                     if (delete_number == 0) {
                         printf("Can't delete that.\n");
