@@ -91,6 +91,7 @@ int main() {
     char all_players[10][11] = {{"p1"}, {"p2"}, {"p3"}};
     int p1_set = 0;
     int p2_set = 0;
+    int player_arr[2] = {9, 9};
 
     for (;;) {
         int next = next_available(all_players);
@@ -100,7 +101,7 @@ int main() {
             players_exist = 1;
         }
 
-        action = player_screen(all_players, players_exist);
+        action = player_screen(all_players, player_arr, players_exist);
 
         if (action == 0 || action == 1) {
             int player_num = get_existing_player(all_players, action + 1, next);
@@ -135,7 +136,7 @@ int main() {
                 };
             }
         } else if (action == 4) {
-
+            printf("Confirming.\n");
 
         } else {
             printf("Unrecognized action.\n");

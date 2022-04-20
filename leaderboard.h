@@ -2,10 +2,10 @@
 #include<stdlib.h>
 #include<string.h>
 
-void sort_names_scores(char all_players[10][11], int all_scores[10]) {
+void sort_names_scores(char all_players[10][11], int all_scores[10], int player_arr[2]) {
     // sorts all players and scores from 
     // highest to lowest
-    int i, j;
+    int i, j, k;
     int sorted;
     char lastplayer[11];
     char player[11];
@@ -31,6 +31,12 @@ void sort_names_scores(char all_players[10][11], int all_scores[10]) {
 
                 sorted = 0;
                 // lastplayer is same
+
+                for (k = 0; k < 2; k ++) {
+                    if (player_arr[k] == j) {
+                        player_arr[k] = j - 1;
+                    }
+                }
 
             } else {
                 memset(lastplayer, 0, sizeof lastplayer);

@@ -9,6 +9,7 @@ const int DELETE_PLAYER = 3;
 const int CONFIRM_PLAYERS = 4;
 const int INVALID = 5;
 
+
 void clear_board(int board[6][7]) {
     // makes board all zeros
     int i, j;
@@ -33,50 +34,41 @@ int next_available(char all_players[10][11]) {
     return 10; 
 }
 
-int find_player(char new_player[11], char all_players[10][11]) {
-    // if new_player in all_players return index
-    // else return next available index
-    for (int i = 0; i < 10; i=i+1) {
-        char player[11] = {0};
-        strcpy(player, all_players[i]); // get player at index
+void show_players(char all_players[10][11], int next) {
+    if (next == 0) { // next available index
+        printf("%s", "No players yet. \n\n");
+    } else {
+        printf("%s", "Here are the current players. \n");
+        char player[11];
+        int i;
+        for (i = 0; i < 10; i ++) {
+            memset(player, 0, sizeof player);
+            strcpy(player, all_players[i]); // get player at index
 
-        if (player[0] == '\0') {        // if empty
-            return i;
-        } else if (strcmp(player, new_player) == 0) {   // if same
-            return i;
+            if (player[0] == '\0') {        // if empty
+                break;
+            }
+            printf("%d. %s\n", i + 1, player);
         }
+        printf("\n");
     }
-    return 0; // change this later
 }
 
-void show_players(char all_players[10][11]) {
-    char player[11];
-    int i;
-    for (i = 0; i < 10; i ++) {
-        memset(player, 0, sizeof player);
-        strcpy(player, all_players[i]); // get player at index
-
-        if (player[0] == '\0') {        // if empty
-            break;
-        }
-        printf("%d. %s\n", i + 1, player);
-    }
-    printf("\n");
-}
-
-int player_screen(char all_players[10][11], int player_arr[2], int players_exist) {
+int player_screen(char all_players[10][11], int player_arr[2], int next) {
     // display player screen
     // allow user to choose next step
 
-    if (players_exist == 1) {
-        printf("%s", "Here are the current players. \n");
-        show_players(all_players);
-    } else {
-        printf("%s", "No players yet. \n\n");
-    }
+    show_players(all_players, next);
     
     printf("%s", "Current Assignments:\n");
-    printf("Player 1: %s\n", all_players[player_arr[0]]);
+    char player1[11];
+    char player2[11];
+    if (player_arr[0] < 10) {
+        strcpy(player1, all_players[player_arr[0]]);
+    } else {
+        strcpy(player1, "");
+    }
+    printf("Player 1: %s\n", player1);
     printf("Player 2: %s\n\n", all_players[player_arr[1]]);
 
     
@@ -100,20 +92,37 @@ int player_screen(char all_players[10][11], int player_arr[2], int players_exist
     else return INVALID;
 }
 
-int select_delete(char all_players[10][11]) {
+int get_existing_player(char all_players[10][11], int player_num, int next) {
+    // selects existing player
+    printf("Player %d choose from list: ", player_num);
+
+    char buffer[3];
+    fgets(buffer, 3, stdin);
+    int num = buffer[0] - '0';
+
+    if (num > 0 && num <= next) {
+        return num;
+    } else {
+        return 0;
+    }
+}
+
+void get_new_player(char new_player[11]) {
+    // gets a player name, puts in new_player
+    printf("%s", "Enter new player's name: ");
+    char buffer[11];
+
+    fgets(buffer, 10, stdin);
+    printf("\n");
+    buffer[strcspn(buffer, "\n")] = 0;  // remove newline
+    buffer[10] = '\0';
+
+    strcpy(new_player, buffer);
+}
+
+int select_delete(char all_players[10][11], int next) {
     // returns number of player to delete
     // 0 if invalid
-    int i;
-    char player[11];
-    for (i = 0; i < 10; i ++) {
-        memset(player, 0, sizeof player);
-        strcpy(player, all_players[i]); // get player at index
-
-        if (player[0] == '\0') {        // if empty
-            break;
-        }
-        printf("%d. %s\n", i + 1, player);
-    }
     printf("%s", "\nSelect player number to delete: ");
 
     char buffer[3];
@@ -122,7 +131,7 @@ int select_delete(char all_players[10][11]) {
     char input = buffer[0];
 
     int num = buffer[0] - '0';
-    if (num > 0 && num < i + 1) return num;     // valid player to delete
+    if (num > 0 && num < next + 1) return num;     // valid player to delete
     else return 0;
 }
 
@@ -146,31 +155,6 @@ void do_delete(char all_players[10][11], int player_index) {
     for (int i = player_index + 1; i < 10; i ++) {
         strcpy(all_players[i - 1], all_players[i]); // move everything one back
     }
+    all_players[9][0] = '\0';
 }
 
-int get_existing_player(char all_players[10][11], int player_num, int next) {
-    // selects existing player
-    show_players(all_players);
-    printf("Player %d choose from list: ", player_num);
-
-    char buffer[3];
-    fgets(buffer, 3, stdin);
-    int num = buffer[0] - '0';
-
-    if (num > 0 && num <= next) {
-        return num;
-    } else {
-        return 0;
-    }
-}
-
-void get_new_player(char new_player[11]) {
-    // gets a player name, puts in new_player
-    printf("%s", "Enter new player's name: ");
-    char buffer[11];
-
-    fgets(buffer, 11, stdin);
-    buffer[strcspn(buffer, "\n")] = 0;  // remove newline
-
-    strcpy(new_player, buffer);
-}

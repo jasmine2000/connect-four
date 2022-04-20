@@ -20,7 +20,7 @@ int main() {
     char all_players[10][11] = {0};   // all players ever
     int all_scores[10] = {0};         // corresponding scores (in same order)
 
-    int player_arr[2] = {9, 9};     // index of current players (from all_players)
+    int player_arr[2] = {10, 10};     // index of current players (from all_players)
     int current_player;     // index of current player (from player_arr)
 
     int winner;                 // index of winner (from player_arr)
@@ -30,7 +30,6 @@ int main() {
 
     int selection;
     int current_column;
-    int players_set[2] = {0, 0};
 
     // board
     int board[6][7];
@@ -47,16 +46,18 @@ int main() {
                 players_exist = 1;
             }
 
-            action = player_screen(all_players, player_arr, players_exist);
+            action = player_screen(all_players, player_arr, next);
 
             if (action == ASSIGN_1 || action == ASSIGN_2) {
-                int player_num = get_existing_player(all_players, action + 1, next);
-                if (player_num == 0) {
-                    printf("Can't select that player. \n");
-                } else {
-                    int player_index = player_num - 1;
-                    player_arr[action] = player_index;
-                    players_set[action] = 1;
+                show_players(all_players, next);
+                if (next > 0) {
+                    int player_num = get_existing_player(all_players, action + 1, next);
+                    if (player_num == 0) {
+                        printf("Can't select that player. \n");
+                    } else {
+                        int player_index = player_num - 1;
+                        player_arr[action] = player_index;
+                    }
                 }
 
             } else if (action == ADD_PLAYER) {
@@ -69,10 +70,9 @@ int main() {
                 }
 
             } else if (action == DELETE_PLAYER) {
-                if (next == 0) {
-                    printf("Nothing to delete.\n\n");
-                } else {
-                    int delete_number = select_delete(all_players);
+                show_players(all_players, next);
+                if (next > 0) {
+                    int delete_number = select_delete(all_players, next);
 
                     if (delete_number == 0) {
                         printf("Can't delete that.\n");
@@ -87,7 +87,7 @@ int main() {
                 }
                 
             } else if (action == CONFIRM_PLAYERS) {
-                if (players_set[0] == 0 || players_set[1] == 0) {
+                if (player_arr[0] == 10 || player_arr[1] == 10) {
                     printf("Players are not both set.\n\n");
                 } else if (player_arr[0] == player_arr[1]) {
                     printf("Player 1 and 2 are the same. Reassign one of them.\n\n");
@@ -173,7 +173,7 @@ int main() {
         } else if (state == LEADERBOARD) {
 
             printf("\n");
-            sort_names_scores(all_players, all_scores);
+            sort_names_scores(all_players, all_scores, player_arr);
             show_stats(all_players, all_scores);
             
             printf("\nPress enter to start a new game: ");
