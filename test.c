@@ -104,7 +104,7 @@ int main() {
         action = player_screen(all_players, player_arr, players_exist);
 
         if (action == 0 || action == 1) {
-            int player_num = get_existing_player(all_players, action + 1, next);
+            int player_num = select_player(all_players, action + 1, next);
             if (player_num == 0) {
                 printf("Can't select that player. \n");
             } else {

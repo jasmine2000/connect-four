@@ -12,46 +12,43 @@ const int CHOOSING=1;
 const int DROPPING=2;
 const int LEADERBOARD=3;
 
+const int max_players = 9;
+
 
 int main() {
     
     int state = SETUP;
     
-    char all_players[10][11] = {0};   // all players ever
-    int all_scores[10] = {0};         // corresponding scores (in same order)
+    char all_players[max_players][11] = {0};   // all players ever
+    int all_scores[max_players] = {0};         // corresponding scores (in same order)
 
-    int player_arr[2] = {10, 10};     // index of current players (from all_players)
+    int player_arr[2] = {max_players, max_players};     // index of current players (from all_players). initialized to invalid indices on purpose
     int current_player;     // index of current player (from player_arr)
 
-    int winner;                 // index of winner (from player_arr)
+    int action;             // used in setup
 
-    int players_exist;
-    int action;
+    int selection;          // used in choosing
+    int current_column;     // used in choosing and dropping
 
-    int selection;
-    int current_column;
+    int winner;             // index of winner (from player_arr)
 
     // board
     int board[6][7];
+    clear_board(board);
 
     for(;;) {
 
         if (state == SETUP) {
-            clear_board(board);
 
             int next = next_available(all_players);
-            if (next == 0) {
-                players_exist = 0;
-            } else {
-                players_exist = 1;
-            }
 
             action = player_screen(all_players, player_arr, next);
 
             if (action == ASSIGN_1 || action == ASSIGN_2) {
                 show_players(all_players, next);
                 if (next > 0) {
-                    int player_num = get_existing_player(all_players, action + 1, next);
+                    printf("Player %d choose from list: ", action + 1);
+                    int player_num = select_player(all_players, next);
                     if (player_num == 0) {
                         printf("Can't select that player. \n");
                     } else {
@@ -61,7 +58,7 @@ int main() {
                 }
 
             } else if (action == ADD_PLAYER) {
-                if (next == 10) {
+                if (next == max_players) {
                     printf("%s", "Can't add any more players. Delete one and try again. \n");
                 } else {
                     char new_player[11];
@@ -72,7 +69,8 @@ int main() {
             } else if (action == DELETE_PLAYER) {
                 show_players(all_players, next);
                 if (next > 0) {
-                    int delete_number = select_delete(all_players, next);
+                    printf("%s", "\nSelect player number to delete: ");
+                    int delete_number = select_player(all_players, next);
 
                     if (delete_number == 0) {
                         printf("Can't delete that.\n");
@@ -87,7 +85,7 @@ int main() {
                 }
                 
             } else if (action == CONFIRM_PLAYERS) {
-                if (player_arr[0] == 10 || player_arr[1] == 10) {
+                if (player_arr[0] == max_players || player_arr[1] == max_players) {
                     printf("Players are not both set.\n\n");
                 } else if (player_arr[0] == player_arr[1]) {
                     printf("Player 1 and 2 are the same. Reassign one of them.\n\n");
@@ -180,6 +178,7 @@ int main() {
             char buffer[3];
             fgets(buffer, 3, stdin);
 
+            clear_board(board);
             state = SETUP;
         }
     }

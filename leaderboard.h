@@ -2,7 +2,7 @@
 #include<stdlib.h>
 #include<string.h>
 
-void sort_names_scores(char all_players[10][11], int all_scores[10], int player_arr[2]) {
+void sort_names_scores(char all_players[max_players][11], int all_scores[max_players], int player_arr[2]) {
     // sorts all players and scores from 
     // highest to lowest
     int i, j, k;
@@ -10,12 +10,12 @@ void sort_names_scores(char all_players[10][11], int all_scores[10], int player_
     char lastplayer[11];
     char player[11];
 
-    for (i = 0; i < 9; i++) {
+    for (i = 0; i < max_players - 1; i++) {
         sorted = 1;
         memset(lastplayer, 0, sizeof lastplayer);
         strcpy(lastplayer, all_players[0]); // first player
 
-        for (j = 1; j < 10; j++) {
+        for (j = 1; j < max_players; j++) {
             memset(player, 0, sizeof player);
             strcpy(player, all_players[j]); // get player at index
             if (player[0] == '\0') {        // if empty
@@ -47,10 +47,10 @@ void sort_names_scores(char all_players[10][11], int all_scores[10], int player_
     }
 }
 
-void show_stats(char all_players[10][11], int all_scores[10]) {
+void show_stats(char all_players[max_players][11], int all_scores[max_players]) {
     // prints out leaderboard
     printf("LEADERBOARD\n");
-    for (int i = 0; i < 10; i=i+1) {
+    for (int i = 0; i < max_players; i=i+1) {
         char player[11] = {0};
         strcpy(player, all_players[i]); // get player at index
 

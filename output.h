@@ -2,6 +2,9 @@
 #include<stdlib.h>
 #include<string.h>
 
+extern const int max_players;
+
+
 void printboard(int board[6][7], int preview, int player) {
     // prints out board
     int i, j;
