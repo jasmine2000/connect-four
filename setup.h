@@ -70,8 +70,13 @@ int player_screen(char all_players[max_players][11], int player_arr[2], int next
     } else {
         strcpy(player1, "");
     }
+    if (player_arr[1] < max_players) {
+        strcpy(player2, all_players[player_arr[1]]);
+    } else {
+        strcpy(player2, "");
+    }
     printf("Player 1: %s\n", player1);
-    printf("Player 2: %s\n\n", all_players[player_arr[1]]);
+    printf("Player 2: %s\n\n", player2);
 
     
     printf("%s", "Press\n1 \t Assign player 1\n2 \t Assign player 2\n");
