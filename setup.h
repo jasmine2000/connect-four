@@ -126,11 +126,11 @@ void get_new_player(char new_player[11]) {
     strcpy(new_player, buffer);
 }
 
-int confirm_delete(char player[11]) {
-    // asks user again if they want to delete
-    // returns 1 to confirm delete and 0 otherwise
+int confirm() {
+    // reused function to confirm something from user
+    // returns 1 to confirm choice and 0 otherwise
 
-    printf("Are you sure you want to delete %s? (y/n) ", player);
+    printf("(y/n) ");
 
     char buffer[3];
     fgets(buffer, 3, stdin);

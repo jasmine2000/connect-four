@@ -78,9 +78,10 @@ int main() {
                         printf("Can't delete that.\n");
                     } else {
                         int delete_index = delete_number - 1;
-                        char delete_player[11];
-                        strcpy(delete_player, all_players[delete_index]);
-                        if (confirm_delete(delete_player) == 1) {
+                        printf("Are you sure you want to delete %s? ", all_players[delete_index]);
+                        
+                        int c = confirm();
+                        if (c == 1) {
                             do_delete(all_players, delete_index);
                         };
                     }
@@ -95,15 +96,14 @@ int main() {
                     printf("Player 1 \t %s\n", all_players[player_arr[0]]);
                     printf("Player 2 \t %s\n", all_players[player_arr[1]]);
 
-                    printf("Confirm selection? (y/n) ");
-                    char buffer[5];
-                    fgets(buffer, 5, stdin);
-                    if (buffer[0] == 'y') {
+                    printf("Confirm selection? ");
+                    int c = confirm();
+                    if (c == 1) {
                         current_player = 0;
                         selection = 4;
 
                         state = CHOOSING;
-                    }
+                    };
                 }
 
             } else { // invalid
