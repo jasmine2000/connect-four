@@ -52,7 +52,7 @@ int main() {
                     printf("Player %d choose from list: ", action + 1);
                     int player_num = select_player(next);
                     if (player_num == 0) {
-                        printf("Can't select that player. \n");
+                        printf("Can't select that player. \n\n");
                     } else {
                         int player_index = player_num - 1;
                         player_arr[action] = player_index;
@@ -113,7 +113,6 @@ int main() {
 
         } else if (state == CHOOSING) {
 
-            int new_selection = 0;
 
             if (selection == 9) {
                 int confirmation = early_exit();
@@ -130,11 +129,9 @@ int main() {
             } else {
                 if (selection == 0) {
                     printf("Invalid move.\n");
-                    new_selection = 1;
                 } else {
                     current_column = selection;
                     printboard(board, current_column, current_player + 1);
-                    new_selection = 1;
                 }
                 selection = get_input(all_players[player_arr[current_player]]);
             }
@@ -144,14 +141,14 @@ int main() {
         } else if (state == DROPPING) {
 
             int column_index = current_column - 1;
-            int row = find_row(board, column_index);
+            int lowest_row = find_row(board, column_index);
 
-            if (row == 6) {
+            if (lowest_row == 6) {
                 printf("Column is full.\n");
                 selection = 4;
                 state = CHOOSING;
             } else {
-                board[row][column_index] = current_player + 1;
+                board[lowest_row][column_index] = current_player + 1;
                 printboard(board, 0, current_player + 1);
                 printf("\n");
 
