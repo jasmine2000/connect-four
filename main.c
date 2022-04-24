@@ -7,7 +7,9 @@
 #include "output.h"
 #include "leaderboard.h"
 
-// #include "integration.h"
+// #include "keypad.h"
+// #include "keyboard.h"
+// #include "tft.h"
 
 const int SETUP=0;
 const int CHOOSING=1;
