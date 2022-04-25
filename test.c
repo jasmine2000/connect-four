@@ -121,10 +121,10 @@ void setup_tests() {
         action = player_screen(all_players, player_arr, next);
 
         if (action == ASSIGN_1 || action == ASSIGN_2) {
-            show_players(all_players, next);
+            temp_show_players(all_players, next);
             if (next > 0) {
                 printf("Player %d choose from list: ", action + 1);
-                int player_num = select_player(all_players, next);
+                int player_num = temp_select_player(all_players, next);
                 if (player_num == 0) {
                     printf("Can't select that player. \n");
                 } else {
@@ -138,15 +138,15 @@ void setup_tests() {
                 printf("%s", "Can't add any more players. Delete one and try again. \n");
             } else {
                 char new_player[11];
-                get_new_player(new_player);
+                temp_get_new_player(new_player);
                 strcpy(all_players[next], new_player);
             }
 
         } else if (action == DELETE_PLAYER) {
-            show_players(all_players, next);
+            temp_show_players(all_players, next);
             if (next > 0) {
                 printf("%s", "\nSelect player number to delete: ");
-                int delete_number = select_player(all_players, next);
+                int delete_number = temp_select_player(all_players, next);
 
                 if (delete_number == 0) {
                     printf("Can't delete that.\n");

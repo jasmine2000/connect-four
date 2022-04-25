@@ -15,7 +15,7 @@ const int keypad_map[16] = {
     20, 0,  21, 13
 };
 
-int get_keypad(int mode, int next) {
+int get_keypress(int mode, int next) {
 
     int data_available;
     int keypad_index;
