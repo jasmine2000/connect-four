@@ -4,8 +4,6 @@
 
 #include "setup.h"
 
-extern const int max_players;
-
 
 void clear_board(int board[6][7]) {
     // makes board all zeros

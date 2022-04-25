@@ -24,6 +24,11 @@ const int DELETE_PLAYER = 3;
 const int CONFIRM_PLAYERS = 4;
 const int INVALID = 5;
 
+// after keypad implement
+// const int COLUMN_SELECT = 0; // gameplay
+// const int PLAYER_SELECT = 1; // adding/deleting during setup
+// const int OPTION_SELECT = 2; // choosing options during setup
+
 const int max_players = 9;
 const int name_length = 11;
 
