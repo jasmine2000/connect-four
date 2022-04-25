@@ -11,42 +11,47 @@
 // #include "keyboard.h"
 // #include "tft.h"
 
+// constants
 const int SETUP=0;
 const int CHOOSING=1;
 const int DROPPING=2;
 const int LEADERBOARD=3;
-
 const int max_players = 9;
 
+// global vars
+int state;
+int board[6][7];
+    
+char all_players[max_players][11] = {0};   // all players ever
+int all_scores[max_players] = {0};         // corresponding scores (in same order)
+
+int player_arr[2] = {max_players, max_players};     // index of current players (from all_players). initialized to invalid indices on purpose
+int current_player;     // index of current player (from player_arr)
+
+// gameplay vars used in choosing + dropping
+int selection;
+int current_column;
+
+
+
+void init() {
+    // CyGlobalIntEnable;
+
+    state = SETUP;
+    current_player = 0;
+    clear_board(board);
+}
 
 int main() {
     
-    int state = SETUP;
-    
-    char all_players[max_players][11] = {0};   // all players ever
-    int all_scores[max_players] = {0};         // corresponding scores (in same order)
-
-    int player_arr[2] = {max_players, max_players};     // index of current players (from all_players). initialized to invalid indices on purpose
-    int current_player;     // index of current player (from player_arr)
-
-    int action;             // used in setup
-
-    int selection;          // used in choosing
-    int current_column;     // used in choosing and dropping
-
-    int winner;             // index of winner (from player_arr)
-
-    // board
-    int board[6][7];
-    clear_board(board);
+    init();
 
     for(;;) {
 
         if (state == SETUP) {
 
             int next = next_available(all_players);
-
-            action = player_screen(all_players, player_arr, next);
+            int action = player_screen(all_players, player_arr, next);
 
             if (action == ASSIGN_1 || action == ASSIGN_2) {
                 show_players(all_players, next);
@@ -154,7 +159,7 @@ int main() {
                 printboard(board, 0, current_player + 1);
                 printf("\n");
 
-                winner = check_winner(board);
+                int winner = check_winner(board);
                 if (winner > 0) {
                     all_scores[player_arr[winner - 1]]++;
                     printf("%s won!\n", all_players[player_arr[winner - 1]]);
