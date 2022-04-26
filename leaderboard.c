@@ -37,6 +37,8 @@ void sort_names_scores(char all_players[max_players][11], int all_scores[max_pla
                 for (k = 0; k < 2; k ++) {
                     if (player_arr[k] == j) {
                         player_arr[k] = j - 1;
+                    } else if (player_arr[k] == j - 1) {
+                        player_arr[k] = j;
                     }
                 }
 
