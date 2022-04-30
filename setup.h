@@ -15,8 +15,6 @@ extern const int name_length;
 
 void clear_board(int board[6][7]);
 
-int next_available(char all_players[max_players][name_length]);
-
 void temp_show_players(char all_players[max_players][name_length]);
 
 int player_screen(char all_players[max_players][name_length], int player_arr[2], int next);
@@ -27,6 +25,6 @@ void temp_get_new_player(char new_player[name_length]);
 
 int temp_confirm();
 
-void do_delete(char all_players[max_players][name_length], int player_index);
+void do_delete(char all_players[max_players][name_length], int player_arr[2], int player_index);
 
 #endif

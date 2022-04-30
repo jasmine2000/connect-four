@@ -4,27 +4,6 @@
 
 #include "gameplay.h"
 
-int temp_get_input(char player[name_length]) {
-    // gets input from player
-    // returns number 1-7
-    // 0 if invalid, 8 if "drop", 9 if "exit game"
-    printf("Player %s enter a column: ", player);
-    char buffer[3];
-    fgets(buffer, 3, stdin);
-    buffer[strcspn(buffer, "\n")] = 0;  // remove newline
-
-    char input = buffer[0];
-
-    if (input == 'd') return 12;         // drop
-
-    else if (input == 'e') return 20;    // exit game
-
-    else {
-        int num = input - '0';
-        if (num > 0 && num < 8) return num;         // valid col
-        else return 0;
-    }
-}
 
 int find_row(int board[6][7], int col) {
     // returns index of lowest unoccupied row

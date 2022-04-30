@@ -3,6 +3,7 @@
 #include<string.h>
 
 #include<tft.h>
+#include<keyboard.h>
 
 // flags
 int confirm_flag;
