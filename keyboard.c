@@ -113,6 +113,7 @@ void keyboard_get_player(char player_name[11]) {
             }
 
         } else if (next_letter == ' ') {    // finish
+            tft_clear_screen();
             return;
 
         } else {
