@@ -3,9 +3,17 @@ from os import path
 prefix = "/usr/bin/clang -fdiagnostics-color=always -g"
 directory = "/Users/jasminewu/Documents/6115/game"
 
-files = ["main", "setup", "gameplay", "leaderboard", "fake_tft"]
+files = ["setup", "gameplay", "leaderboard", "fake_tft"]
 
-suffix = "-o /Users/jasminewu/Documents/6115/game/main"
+suffix = "-o /Users/jasminewu/Documents/6115/game/"
+
+# MAIN
+files.append("main")
+suffix += "main"
+ 
+# TESTING
+# files.append("test")
+# suffix += "test"
 
 segments = []
 segments.append(prefix)

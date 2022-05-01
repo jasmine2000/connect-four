@@ -153,6 +153,8 @@ void setup_state() {
                         tft_reassign(player_arr);
                     } break;
                 }
+            } else {
+                error();
             }
         } break;
 
@@ -211,6 +213,8 @@ void setup_state() {
                         
                     } break;
                 }
+            } else {
+                error();
             }
         } break;
 
@@ -353,5 +357,6 @@ void leaderboard_state() {
     
     printf("\nPress any key to start a new game: ");
     get_keypress(CONFIRM_SELECT, 0);
+    clear_board();
     state = HOME;
 }

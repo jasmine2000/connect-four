@@ -36,9 +36,11 @@ int check_winner(int board[6][7]) {
                 d_right = right && vertical;
                 d_left = left && vertical;
 
+                int current_val;
                 if (right) {
                     for (k = 1; k < 4; k++) {
-                        if (board[i][j + k] != player && board[i][j + k] != 3) {
+                        current_val = board[i][j + k];
+                        if (current_val != player && current_val != 3) {
                             right = 0;
                             break;
                         }
@@ -48,7 +50,8 @@ int check_winner(int board[6][7]) {
 
                 if (vertical) {
                     for (k = 1; k < 4; k++) {
-                        if (board[i + k][j] != player && board[i + k][j] != 3) {
+                        current_val = board[i + k][j];                        
+                        if (current_val != player && current_val != 3) {
                             vertical = 0;
                             break;
                         }
@@ -58,7 +61,8 @@ int check_winner(int board[6][7]) {
 
                 if (d_right) {
                     for (k = 1; k < 4; k++) {
-                        if (board[i + k][j + k] != player && board[i + k][j + k] != 3) {
+                        current_val = board[i + k][j + k];
+                        if (current_val != player && current_val != 3) {
                             d_right = 0;
                             break;
                         }
@@ -68,7 +72,8 @@ int check_winner(int board[6][7]) {
 
                 if (d_left) {
                     for (k = 1; k < 4; k++) {
-                        if (board[i + k][j - k] != player && board[i + k][j - k] != 3) {
+                        current_val = board[i + k][j - k];
+                        if (current_val != player && current_val != 3) {
                             d_left = 0;
                             break;
                         }
@@ -98,7 +103,7 @@ int get_computer_column(int board[6][7]) {
         board[row][col] = 3;
         winner_result = check_winner(board);
         board[row][col] = 0;
-        if (winner_result > 0) return col;
+        if (winner_result > 0) return col + 1;
     }
 
     int random_num = rand();

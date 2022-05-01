@@ -5,43 +5,71 @@
 
 #include "setup.h"
 #include "gameplay.h"
-#include "output.h"
 #include "leaderboard.h"
+#include "fake_tft.h"
 
-// constants
-const int SETUP=0;
-const int CHOOSING=1;
-const int DROPPING=2;
-const int LEADERBOARD=3;
+// gameplay constants
+#define HOME        0
+#define SETUP       1
+#define CHOOSING    2
+#define DROPPING    3
+#define LEADERBOARD 4
 
-const int ASSIGN_1 = 0;
-const int ASSIGN_2 = 1;
-const int ADD_PLAYER = 2;
-const int DELETE_PLAYER = 3;
-const int CONFIRM_PLAYERS = 4;
-const int INVALID = 5;
+#define ASSIGN_1        1
+#define ASSIGN_2        2
+#define ADD_PLAYER      10
+#define DELETE_PLAYER   11
+#define CONFIRM_PLAYERS 12
+#define GO_BACK         20
 
-// after keypad implement
-// const int COLUMN_SELECT = 0; // gameplay
-// const int PLAYER_SELECT = 1; // adding/deleting during setup
-// const int OPTION_SELECT = 2; // choosing options during setup
-
-const int max_players = 9;
-const int name_length = 11;
+const int COLUMN_SELECT = 0; // gameplay
+const int PLAYER_SELECT = 1; // adding/deleting during setup
+const int OPTION_SELECT = 2; // choosing options during setup
+const int CONFIRM_SELECT = 3; // confirmation
+const int GAME_SELECT = 4;      // select game type
 
 
+void computer_column_tests();
 void winner_tests();
 void sort_tests();
 void setup_tests();
 
 
 int main() {
+    computer_column_tests();
 
     winner_tests();
 
     sort_tests();
     
     return 0;
+}
+
+void computer_column_tests() {
+    int column;
+    int board[6][7] = { 
+        { 0, 0, 0, 1, 0, 0, 0 }, 
+        { 0, 0, 0, 1, 0, 0, 0 }, 
+        { 0, 0, 0, 1, 0, 0, 0 }, 
+        { 0, 0, 0, 0, 0, 0, 0 }, 
+        { 0, 0, 0, 0, 0, 0, 0 }, 
+        { 0, 0, 0, 0, 0, 0, 0 }
+    }; 
+    column = get_computer_column(board);
+    assert(column == 4);
+
+    int board2[6][7] = { 
+        { 0, 0, 2, 1, 1, 1, 0 }, 
+        { 0, 0, 0, 2, 1, 1, 0 }, 
+        { 0, 0, 0, 0, 2, 1, 0 }, 
+        { 0, 0, 0, 0, 0, 0, 0 }, 
+        { 0, 0, 0, 0, 0, 0, 0 }, 
+        { 0, 0, 0, 0, 0, 0, 0 }
+    }; 
+    column = get_computer_column(board);
+    assert(column == 4);
+
+    printf("Passed all computer tests.\n");
 }
 
 
@@ -117,7 +145,7 @@ void sort_tests() {
     int all_scores1[10] = {1, 2, 3};
     int player_arr1[2] = {0, 1};
     sort_names_scores(all_players1, all_scores1, player_arr1);
-    temp_show_players(all_players1);
+    tft_show_players(all_players1, 3);
 
     char all_players2[10][11] = {
         {"player1"}, {"player2"}, {"player3"}, 
