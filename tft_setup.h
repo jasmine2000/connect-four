@@ -31,7 +31,7 @@ void tft_show_players(char all_players[max_players][name_length], int next);
 
 void tft_reassign(int player_arr[2]);
 
-void tft_show_options();
+void tft_show_options(int game_type);
 
 
 

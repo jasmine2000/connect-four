@@ -91,7 +91,7 @@ void tft_reassign(int player_arr[2]) {
 
 }
 
-void tft_show_options() {
+void tft_show_options(int game_type) {
     GUI_COLOR background = GUI_LIGHTMAGENTA;
     GUI_SetColor(background);
     GUI_FillRect(options_x, options_y, options_x + options_w, options_y + 3 * row_h);
@@ -125,6 +125,12 @@ void tft_show_options() {
         }
     }
     GUI_SetBkColor(GUI_WHITE);
+
+    if (game_type == 1) {
+        GUI_SetColor(GUI_WHITE);
+        GUI_FillRect(options_x, options_y + 2 * row_h, options_x + optioons_w / 2, options_y + 3 * row_h);
+        GUI_SetColor(GUI_BLACK);
+    }
 }
 
 

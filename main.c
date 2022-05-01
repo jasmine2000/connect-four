@@ -4,7 +4,6 @@
 
 #include "setup.h"
 #include "gameplay.h"
-#include "output.h"
 #include "leaderboard.h"
 
 #include "fake_tft.h"
@@ -19,21 +18,24 @@
 #define name_length 11
 
 // gameplay constants
-#define SETUP 0
-#define CHOOSING 1
-#define DROPPING 2
-#define LEADERBOARD 3
+#define HOME        0
+#define SETUP       1
+#define CHOOSING    2
+#define DROPPING    3
+#define LEADERBOARD 4
 
 #define ASSIGN_1        1
 #define ASSIGN_2        2
 #define ADD_PLAYER      10
 #define DELETE_PLAYER   11
 #define CONFIRM_PLAYERS 12
+#define GO_BACK         20
 
 const int COLUMN_SELECT = 0; // gameplay
 const int PLAYER_SELECT = 1; // adding/deleting during setup
 const int OPTION_SELECT = 2; // choosing options during setup
 const int CONFIRM_SELECT = 3; // confirmation
+const int GAME_SELECT = 4;      // select game type
 
 // global vars
 int state;
@@ -45,6 +47,8 @@ int num_players;
 
 int player_arr[2] = {max_players, max_players};     // index of current players (from all_players). initialized to invalid indices on purpose
 int current_player;     // index of current player (from player_arr)
+
+int game_type;      // 1 or 2 depending on number of players
 
 // gameplay vars used in choosing + dropping
 int selection;
@@ -58,6 +62,7 @@ const int bottom_y = 240;
 const int bottom_row_h = 20;
 
 // state functions
+void home_state();
 void setup_state();
 void choosing_state();
 void dropping_state();
@@ -66,13 +71,11 @@ void leaderboard_state();
 void init() {
     // CyGlobalIntEnable;
 
-    state = SETUP;
+    state = HOME;
     current_player = 0;
     num_players = 0;
     tft_show_players(all_players, num_players);
-    tft_show_options();
     
-    clear_board(board);
     clear_board(board);
 }
 
@@ -83,6 +86,9 @@ int main() {
     for(;;) {
 
         switch (state) {
+            case HOME:
+                home_state();
+                break;
 
             case SETUP: 
                 setup_state();
@@ -104,14 +110,31 @@ int main() {
     }
 }
 
+void home_state() {
+    tft_clear_screen();
+    tft_show_home();
+    for (;;) {
+        int action = get_keypress(OPTION_SELECT, 0);
+        if (action > 0) {
+            game_type = action;
+            state = SETUP;
+            break;
+        }
+    }
+}
+
 
 void setup_state() {
-    tft_show_options();
+    tft_show_options(game_type);
     int action = get_keypress(OPTION_SELECT, 0);
 
     switch (action) {
-        case ASSIGN_1:
         case ASSIGN_2:
+            if (game_type == 1) {
+                error();        // can't select second player in single player mode
+                break;
+            }
+        case ASSIGN_1:
         {
             if (num_players > 0) {
                 tft_clear_bottom();
@@ -173,6 +196,7 @@ void setup_state() {
                         GUI_DispStringAt("Press C to confirm delete", bottom_x, bottom_y + 2.5 * bottom_row_h);
                         GUI_DispStringAt("Press any other key to cancel", bottom_x, bottom_y + 3 * bottom_row_h);
                         
+                        // DELAY
                         int c = get_keypress(CONFIRM_SELECT, 0);
                         if (c == 1) {
                             do_delete(all_players, player_arr, delete_index);
@@ -192,20 +216,24 @@ void setup_state() {
 
         case CONFIRM_PLAYERS:
         {
-            if (player_arr[0] == max_players || player_arr[1] == max_players) {
-                error(); // Players are not both set
+            if (player_arr[0] == max_players) {
+                error(); // P1 must be set
+            } else if (player_arr[1] == max_players && game_type == 2) {
+                error(); // P2 must be set for 2 player
             } else if (player_arr[0] == player_arr[1]) {
                 error(); // Player 1 and 2 are the same. Reassign one of them
             } else {
                 tft_clear_bottom();
                 
                 GUI_DispStringAt("Player 1: ", 25, 240);
-                GUI_DispStringAt("Player 2: ", 25, 260);
-                
                 GUI_DispStringAt(all_players[player_arr[0]], 100, 240);
-                GUI_DispStringAt(all_players[player_arr[1]], 100, 260);
+
+                if (game_type == 2) {
+                    GUI_DispStringAt("Player 2: ", 25, 260);
+                    GUI_DispStringAt(all_players[player_arr[1]], 100, 260);
+                }
                                         
-                GUI_DispStringAt("Press C to confirm players", bottom_x, 280);
+                GUI_DispStringAt("Press C to confirm player(s)", bottom_x, 280);
                 GUI_DispStringAt("Press any other key to cancel", bottom_x, 300);
                 
                 int c = get_keypress(CONFIRM_SELECT, 0);
@@ -221,6 +249,12 @@ void setup_state() {
             }
         } break;
 
+        case GO_BACK:
+        {
+            memset(player_arr, max_players, sizeof player_arr); // empty player assignments
+            state = HOME;
+        } break;
+
         default:
             error(); // printf("Unrecognized action.\n");
             break;
@@ -229,12 +263,13 @@ void setup_state() {
 
 void choosing_state() {
     tft_player_turn(all_players[player_arr[current_player]]);
+
+    if (game_type == 1 && current_player == 1) {        // single player and its the computers turn
+        current_column = get_computer_column(board);
+        selection = 13;
+    }
     
     switch (selection) {
-        case 0:
-            error(); //Invalid move
-            selection = get_keypress(COLUMN_SELECT, 0);
-            break;
 
         case 13:
             state = DROPPING;
@@ -251,24 +286,26 @@ void choosing_state() {
                     break;
 
                 default:
-                    selection = current_column;
+                    selection = current_column; // set back to last valid entry
                     break;
             }
         } break;
 
         default:
         {
-            current_column = selection;
+            if (selection == 0) {
+                error(); //Invalid move
+            } else {
+                current_column = selection;
 
-            // update display
-            temp_printboard(board, current_column, current_player + 1);
-            tft_preview_choice(selection, current_player + 1);
+                // update display
+                temp_printboard(board, current_column, current_player + 1);
+                tft_preview_choice(selection, current_player + 1);
+            }
 
             selection = get_keypress(COLUMN_SELECT, 0);
         } break;
     }
-
-
 
     printf("\n");
 }
@@ -316,5 +353,5 @@ void leaderboard_state() {
     
     printf("\nPress any key to start a new game: ");
     get_keypress(CONFIRM_SELECT, 0);
-    state = SETUP;
+    state = HOME;
 }

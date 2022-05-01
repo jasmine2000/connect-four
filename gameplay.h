@@ -5,10 +5,10 @@
 
 extern const int name_length;
 
-int temp_get_input(char player[11]);
-
 int find_row(int board[6][7], int col);
 
 int check_winner(int board[6][7]);
+
+int get_computer_column(int board[6][7]);
 
 #endif
