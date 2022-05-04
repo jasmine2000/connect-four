@@ -1,0 +1,30 @@
+GUI_SetFont(6x8);
+
+const int radius = 20;
+const int logo_x = 30;
+const int logo_y = 80;
+const int logo_w = 180;
+
+const int instruction_y = logo_y + 3 * radius;
+
+const int text_width = 24;
+const int text_height = 32;
+const int text_y = logo_x + radius - height / 2;
+
+GUI_SetColor(my_red);
+GUI_FillRoundedRect(logo_x, logo_y, logo_x + logo_w, logo_y + 2 * radius, radius);
+GUI_SetFont(24x32);
+GUI_SetColor(my_yellow);
+GUI_DispStringAt(“Connect”, logo_x + 5, text_y);
+
+GUI_FillCircle(logo_x + logo_w - radius, logo_y + radius, radius - 3);
+GUI_SetColor(my_red);
+GUI_DispCharAt(“4”, logo_x + logo_w - radius - text_width / 2, text_y);
+GUI_SetColor(GUI_BLACK);
+
+GUI_SetFont(12x16);
+GUI_DrawRect(logo_x + radius, instruction_y, logo_x + logo_w - radius, instruction_y + 3 * radius)
+GUI_DispStringAt(“Press”, logo_x + radius, instruction_y + 3 * radius + 2);
+GUI_DispStringAt(“1\tSingle Player”, logo_x + radius, instruction_y + 4 * radius + 2);
+GUI_DispStringAt(“2\tTwo Player”, logo_x + radius, instruction_y + 5 * radius + 2);
+
