@@ -15,16 +15,15 @@ extern const int name_length;
 
 void clear_board(int board[6][7]);
 
-void temp_show_players(char all_players[max_players][name_length]);
+void do_delete(char all_players[10][11], int all_scores[max_players], int player_arr[2], int player_index);
 
-int player_screen(char all_players[max_players][name_length], int player_arr[2], int next);
+
+void temp_show_players(char all_players[max_players][name_length]);
 
 int temp_select_player(int next);
 
 void temp_get_new_player(char new_player[name_length]);
 
 int temp_confirm();
-
-void do_delete(char all_players[max_players][name_length], int player_arr[2], int player_index);
 
 #endif
