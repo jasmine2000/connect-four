@@ -23,6 +23,7 @@
 #define DROPPING    3
 #define LEADERBOARD 4
 
+#define HELP            30
 #define ASSIGN_1        1
 #define ASSIGN_2        2
 #define ADD_PLAYER      10
@@ -35,6 +36,16 @@ const int PLAYER_SELECT = 1; // adding/deleting during setup
 const int OPTION_SELECT = 2; // choosing options during setup
 const int CONFIRM_SELECT = 3; // confirmation
 const int GAME_SELECT = 4;      // select game type
+
+// tft constants
+const int list_x = 20;
+const int bottom_x = 10;
+const int bottom_y = 240;
+const int bottom_row_h = 20;
+
+const int my_red = GUI_BLUE;
+const int my_yellow = GUI_GREEN + GUI_BLUE;
+const int my_blue = GUI_RED;
 
 // global vars
 int state;
@@ -67,16 +78,26 @@ void choosing_state();
 void dropping_state();
 void leaderboard_state();
 
-void init() {
+void init()
+{   
     // CyGlobalIntEnable;
-
-    // logic initialize upon wakeup
-    state = HOME;
-    current_player = 0;
-    num_players = 0;
-    tft_show_players(all_players, num_players);
     
-    clear_board(board);
+    // UART_Start();                       // initialize UART
+    // UART_ClearRxBuffer();
+    // UART_ClearTxBuffer();
+    
+    // // init tft
+    // SPIM_1_Start();
+    // //emwin
+    // GUI_Init();                             // initilize graphics library
+    // GUI_Clear();
+    // GUI_SetBkColor(GUI_WHITE);
+    // tft_clear_screen();
+    
+    // gameplay init
+    num_players = 0;
+    state = HOME;
+    
 }
 
 int main() {
@@ -113,10 +134,22 @@ int main() {
 void home_state() {
     tft_clear_screen();
     tft_show_home();
+        
     for (;;) {  // while not inputting 1 or 2, stay in loop
         int action = get_keypress(GAME_SELECT, 0);
-        if (action > 0) {
+        if (action > 0) { // game init
+            if (action == 1) {
+                player_arr[1] = max_players; // unassign second player if previously assigned
+            }
+            
             game_type = action;
+            current_player = 0;
+            clear_board(board);
+            
+            tft_clear_screen();
+            tft_show_players_and_scores(all_players, all_scores, num_players, 0);
+            tft_reassign(player_arr);
+            
             state = SETUP;
             break;
         }
@@ -137,10 +170,10 @@ void setup_state() {
         case ASSIGN_1:
         {
             if (num_players > 0) {
-                tft_clear_bottom();     // leave player list
-                GUI_DispStringAt("Choose player to assign with keypad", bottom_x, bottom_y);
+                tft_clear_bottom();
+                GUI_DispStringAt("Choose player to assign with keypad", list_x, bottom_y);
                 
-                // insert keypad delay?
+                CyDelay(250);
                 int player_num = get_keypress(PLAYER_SELECT, num_players);
                 switch (player_num) {
                     case 0:
@@ -150,8 +183,12 @@ void setup_state() {
                     default:
                     {
                         int player_index = player_num - 1;
-                        player_arr[action - 1] = player_index;
-                        tft_reassign(player_arr);       // redisplay assignments
+                        int arr_index = action - 1;
+                        player_arr[arr_index] = player_index;
+                        if (player_arr[!arr_index] == player_index) {   // if player was previously set to other player
+                            player_arr[!arr_index] = max_players;
+                        }
+                        tft_reassign(player_arr);
                     } break;
                 }
             } else {
@@ -164,15 +201,15 @@ void setup_state() {
             if (num_players == max_players) {
                 error(); // Can't add any more players
             } else {
-                char new_player[name_length];   // new name from keyboard flow
+                char new_player[name_length];
                 tft_clear_screen();
                 keyboard_get_player(new_player);
                 
-                strcpy(all_players[num_players], new_player);   // add new player
+                strcpy(all_players[num_players], new_player);
                 num_players ++;
                 
-                tft_show_players(all_players, num_players);     // update player list
-                tft_reassign(player_arr);                       // (assignments were erased)
+                tft_show_players_and_scores(all_players, all_scores, num_players, 0);
+                tft_reassign(player_arr);
             }
         } break;
 
@@ -180,9 +217,10 @@ void setup_state() {
         {
             if (num_players > 0) {
                 
-                tft_clear_bottom();     // leave player list
-                GUI_DispStringAt("Choose player to delete with keypad", bottom_x, bottom_y);
+                tft_clear_bottom();
+                GUI_DispStringAt("Choose player to delete with keypad", list_x, bottom_y);
                 
+                CyDelay(250);
                 int delete_number = get_keypress(PLAYER_SELECT, num_players);
                 switch (delete_number) {
                     case 0:
@@ -192,30 +230,29 @@ void setup_state() {
                     {
                         int delete_index = delete_number - 1;
                       
-                        GUI_DispStringAt("Deleting: ", bottom_x, bottom_y + 1.5 * bottom_row_h);
-                        GUI_DispStringAt(all_players[delete_index], bottom_x + 100, bottom_y + 1.5 * bottom_row_h);
+                        GUI_DispStringAt("Deleting: ", list_x, bottom_y + 1.5 * bottom_row_h);
+                        GUI_DispStringAt(all_players[delete_index], list_x + 100, bottom_y + 1.5 * bottom_row_h);
                         
-                        GUI_DispStringAt("Press C to confirm delete", bottom_x, bottom_y + 2.5 * bottom_row_h);
-                        GUI_DispStringAt("Press any other key to cancel", bottom_x, bottom_y + 3 * bottom_row_h);
+                        GUI_DispStringAt("Press C to confirm delete", list_x, bottom_y + 2.5 * bottom_row_h);
+                        GUI_DispStringAt("Press any other key to cancel", list_x, bottom_y + 3 * bottom_row_h);
                         
-                        // insert keypad delay?
+                        CyDelay(250);
                         int c = get_keypress(CONFIRM_SELECT, 0);
                         if (c == 1) {
-                            do_delete(all_players, player_arr, delete_index); // remove from player list
+                            do_delete(all_players, all_scores, player_arr, delete_index);
                             num_players --;
                         
-                            tft_clear_screen();         // redisplay everything
-                            tft_show_players(all_players, num_players);
+                            tft_clear_screen();
+                            tft_show_players_and_scores(all_players, all_scores, num_players, 0);
                             tft_reassign(player_arr);
                         } else {
-                            tft_clear_bottom();         // if cancelled delete, just "erase" bottom
+                            tft_clear_bottom();
                         };
                         
                     } break;
                 }
             } else {
-                error();        // cant delete when no players
-            }
+                error();
         } break;
 
         case CONFIRM_PLAYERS:
@@ -229,50 +266,62 @@ void setup_state() {
             } else {
                 tft_clear_bottom();
                 
-                // show assignments
-                GUI_DispStringAt("Player 1: ", 25, 240);
+                GUI_DispStringAt("Player 1: ", list_x, 240);
                 GUI_DispStringAt(all_players[player_arr[0]], 100, 240);
-
+                
                 if (game_type == 2) {
-                    GUI_DispStringAt("Player 2: ", 25, 260);
+                    GUI_DispStringAt("Player 2: ", list_x, 260);
                     GUI_DispStringAt(all_players[player_arr[1]], 100, 260);
                 }
-
-                // request assignment confirmation             
-                GUI_DispStringAt("Press C to confirm player(s)", bottom_x, 280);
-                GUI_DispStringAt("Press any other key to cancel", bottom_x, 300);
                 
-                // insert keypad delay?
+                GUI_DispStringAt("Press C to confirm players", list_x, 280);
+                GUI_DispStringAt("Press any other key to cancel", list_x, 300);
+                
+                CyDelay(250);
                 int c = get_keypress(CONFIRM_SELECT, 0);
                 if (c == 1) {
-                    // init gameplay
                     current_player = 0;
                     selection = 4;
                     state = CHOOSING;
-
+                    
                     tft_clear_screen();
+                    tft_init_board();
+                    player_lights(current_player);
                 } else {
                     tft_clear_bottom();
                 };
             }
         } break;
-
+        
         case GO_BACK:
         {
             memset(player_arr, max_players, sizeof player_arr); // empty player assignments
             state = HOME;
         } break;
+        
+        case HELP:
+        {
+            tft_clear_screen();
+            tft_help_screen();
+            get_keypress(CONFIRM_SELECT, 0);    // just waiting for keypress
+            
+            tft_clear_screen();
+            tft_show_players_and_scores(all_players, all_scores, num_players, 0);
+            tft_reassign(player_arr);
+        }
 
         default:
             error(); // printf("Unrecognized action.\n");
             break;
+        }
     }
 }
 
 void choosing_state() {
-
+    
     if (game_type == 1 && current_player == 1) {        // single player and its the computers turn
         current_column = get_computer_column(board);    // set column
+        CyDelay(500);
         selection = 13;                                 // drop piece
     }
 
@@ -286,15 +335,26 @@ void choosing_state() {
 
         case 20:                // * on keypad (exit)
         {
-            printf("Are you sure you want to exit (y/n): ");
+            CyDelay(250);
+            GUI_SetColor(GUI_WHITE);
+            GUI_FillRect(10, 290, 240, 320);
+            GUI_SetColor(GUI_BLACK);
+            GUI_SetBkColor(my_yellow);
+            GUI_DispStringAt("Press C to confirm exit: ", 15, 295);
+            GUI_SetBkColor(GUI_WHITE);
             int c = get_keypress(CONFIRM_SELECT, 0);
             switch (c) {
                 case 1:
                     state = LEADERBOARD;
+                    player_lights(2);
                     tft_clear_screen();
                     break;
 
                 default:
+                    GUI_SetColor(GUI_WHITE);
+                    GUI_FillRect(10, 290, 240, 320);
+                    GUI_SetColor(GUI_BLACK);
+                    GUI_DispStringAt("Press D to drop", 15, 295);
                     selection = current_column; // set back to last valid entry
                     break;
             }
@@ -308,10 +368,10 @@ void choosing_state() {
                 current_column = selection;     // set current column if valid column entry
 
                 // update display
-                temp_printboard(board, current_column, current_player + 1);
-                tft_preview_choice(selection, current_player + 1);  // update preview
+                // temp_printboard(board, current_column, current_player + 1);
+                tft_preview_choice(current_column, current_player);  // update preview
             }
-
+            CyDelay(250);
             selection = get_keypress(COLUMN_SELECT, 0); // get next user input
         } break;
     }
@@ -333,22 +393,28 @@ void dropping_state() {
         {
             // assign value and show on display
             board[lowest_row][column_index] = current_player + 1;
-            tft_drop_chip(lowest_row, column_index, current_player + 1);
+            tft_drop_chip(lowest_row, column_index, current_player);
 
             int winner = check_winner(board);   // check if someone won
+            int winner_index = winner - 1;
             if (winner == 3) {          // 3 == draw
-                tft_win_message("");    // TODO
+                tft_win_message(winner, "");
+                player_lights(2);
 
             } else if (winner > 0) {   // 1 or 2 = winner
-                all_scores[player_arr[winner - 1]] ++;
-                tft_win_message(all_players[player_arr[winner - 1]]);   // TODO
-
+                all_scores[player_arr[winner_index]] ++;
+                tft_win_message(winner_index, all_players[player_arr[winner_index]]);   // TODO
+                CyDelay(2000);
+                tft_clear_screen();
+                
+                player_lights(winner_index);
                 state = LEADERBOARD;
 
             } else {
                 current_player = (current_player + 1) % 2;      // increment and mod for player index
                 selection = 4;
                 
+                player_lights(current_player);
                 state = CHOOSING;
             }
         } break;
@@ -359,12 +425,11 @@ void leaderboard_state() {
     
     sort_names_scores(all_players, all_scores, player_arr); // sort so in order
 
-    GUI_DispStringAt("LEADERBOARD", 20, 12);
-    tft_show_players(all_players, num_players);
-    tft_show_scores(all_scores);        // TODO
+    tft_show_players_and_scores(all_players, all_scores, num_players, 1);
     
-    printf("\nPress any key to start a new game: ");
+    GUI_DispStringAt("Press any key to go to home screen", list_x, bottom_y);
     get_keypress(CONFIRM_SELECT, 0);
-    clear_board();
+    player_lights(2);
     state = HOME;
 }
+
