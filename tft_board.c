@@ -18,6 +18,7 @@
 #include "tft_board.h"
 #include "GUI.h"
 
+
 const int BOARDX = 15;
 const int BOARDY = 100;
 const int BOARDW = 210;
@@ -25,9 +26,9 @@ const int BOARDH = 180;
 
 const int SIDELENGTH = 30;
 
-const int my_red = GUI_BLUE;
-const int my_blue = GUI_RED;
-const int my_yellow = GUI_GREEN + GUI_BLUE;
+extern const int my_red;
+extern const int my_yellow;
+extern const int my_blue;
 
 
 void tft_init_board() 
@@ -54,14 +55,20 @@ void tft_init_board()
     }
     GUI_SetColor(GUI_BLACK);
     
-    GUI_DispStringAt("Press A to confirm column", BOARDX, BOARDY + BOARDH + SIDELENGTH / 2);
+    GUI_DispStringAt("Press D to drop", BOARDX, BOARDY + BOARDH + SIDELENGTH / 2);
 }
 
+
 void tft_player_turn(char player_name[11]) {
+    GUI_SetColor(GUI_WHITE);
+    GUI_FillRect(BOARDX, 0, BOARDX + BOARDW, SIDELENGTH);
+    
+    GUI_SetColor(GUI_BLACK);
     char message[30];
     sprintf(message, "%s: choose column", player_name);
     GUI_DispStringAt(message, BOARDX, SIDELENGTH / 2);
 }
+
 
 void tft_preview_choice(int column, int player_num) {
     GUI_SetColor(GUI_WHITE);
@@ -86,6 +93,7 @@ void tft_preview_choice(int column, int player_num) {
     }
     GUI_SetColor(GUI_BLACK);
 }
+
 
 void tft_drop_chip(int row, int column, int player_num) {
     GUI_COLOR chip_color;
