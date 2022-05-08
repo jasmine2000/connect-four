@@ -25,9 +25,19 @@ int check_winner(int board[6][7]) {
     int right, left, vertical;      // if enough space in directions to have four
     int d_right, d_left;
     int player;
+    int test_chip = 0;
     for (i = 0; i < 6; i++) {
         for (j = 0; j < 7; j++) {
+            right = 0;
+            left = 0;
+            vertical = 0;
+            test_chip = 0;
+            
             player = board[i][j];
+            if (player  == 3) {
+                test_chip = 1;
+            }
+            
             if (player != 0) {
                 if (j + 3 <= 6) right = 1;
                 if (j - 3 >= 0) left = 1;
@@ -37,6 +47,9 @@ int check_winner(int board[6][7]) {
                 d_left = left && vertical;
 
                 int current_val;
+                if (test_chip && board[i][j + 1] != 0) {
+                    player = board[i][j + 1];
+                }
                 if (right) {
                     for (k = 1; k < 4; k++) {
                         current_val = board[i][j + k];
@@ -47,7 +60,10 @@ int check_winner(int board[6][7]) {
                     }
                 }
                 if (right) return player;
-
+                
+                if (test_chip && board[i + 1][j] != 0) {
+                    player = board[i + 1][j];
+                }
                 if (vertical) {
                     for (k = 1; k < 4; k++) {
                         current_val = board[i + k][j];                        
@@ -59,6 +75,9 @@ int check_winner(int board[6][7]) {
                 }
                 if (vertical) return player;
 
+                if (test_chip && board[i + 1][j + 1] != 0) {
+                    player = board[i + 1][j + 1];
+                }
                 if (d_right) {
                     for (k = 1; k < 4; k++) {
                         current_val = board[i + k][j + k];
@@ -70,6 +89,9 @@ int check_winner(int board[6][7]) {
                 }
                 if (d_right) return player;
 
+                if (test_chip && board[i + 1][j - 1] != 0) {
+                    player = board[i + 1][j - 1];
+                }                
                 if (d_left) {
                     for (k = 1; k < 4; k++) {
                         current_val = board[i + k][j - k];
